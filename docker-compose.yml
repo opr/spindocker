@@ -1,0 +1,69 @@
+version: '3.3'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: somewordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+   wordpress:
+     depends_on:
+       - db
+     build:
+       context: .
+       dockerfile: Dockerfile
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       PHP_IDE_CONFIG: "serverName=docker"
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+       JETPACK_AUTOLOAD_DEV: 'true'
+       WP_DEBUG: 'true'
+       SCRIPT_DEBUG: 'true'
+     volumes:
+       - './:/var/www/html'
+       - usrbin_data:/usr/bin
+       - ./wp-content/uploads:/var/www/html/wp-content/uploads
+       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+       - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+       - ./error-reporting.ini:/usr/local/etc/php/conf.d/error-reporting.ini
+       - ./wp-content/plugins/woocommerce-gutenberg-products-block:/var/www/html/wp-content/plugins/woocommerce-gutenberg-products-block
+   wordpress_fast:
+     depends_on:
+       - db
+     build:
+       context: .
+       dockerfile: DockerfileFast
+     ports:
+       - "7000:80"
+     restart: always
+     environment:
+       PHP_IDE_CONFIG: "serverName=docker"
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+       JETPACK_AUTOLOAD_DEV: 'true'
+       WP_DEBUG: 'true'
+       SCRIPT_DEBUG: 'true'
+     volumes:
+       - './:/var/www/html'
+       - usrbin_data:/usr/bin
+       - ./wp-content/uploads:/var/www/html/wp-content/uploads
+       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+       - ./xdebug.fast.ini:/usr/local/etc/php/conf.d/xdebug.fast.ini
+       - ./error-reporting.ini:/usr/local/etc/php/conf.d/error-reporting.ini
+       - ./wp-content/plugins/woocommerce-gutenberg-products-block:/var/www/html/wp-content/plugins/woocommerce-gutenberg-products-block
+volumes:
+    db_data: {}
+    usrbin_data: {}
+    opr_wordpress: {}
